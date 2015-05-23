@@ -6,22 +6,30 @@
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>BF55AEAB-7CE1-4024-97D4-D09CB8615318</string>
+	<key>IDESourceControlProjectName</key>
+	<string>waterPlane</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>752B89503EB005D8DB7735E38B3A3A37374BD207</key>
+		<string>https://github.com/usm916/waterPlane.git</string>
 		<key>7E804D925461714118DB355C65BC964B41D94376</key>
 		<string>https://github.com/rezaali/ofxUI.git</string>
 	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>waterPlane.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>752B89503EB005D8DB7735E38B3A3A37374BD207</key>
+		<string>../..</string>
 		<key>7E804D925461714118DB355C65BC964B41D94376</key>
-		<string>ofxUI/</string>
+		<string>../../../addons/ofxUI</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/rezaali/ofxUI.git</string>
+	<string>https://github.com/usm916/waterPlane.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>7E804D925461714118DB355C65BC964B41D94376</string>
+	<string>752B89503EB005D8DB7735E38B3A3A37374BD207</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -31,6 +39,14 @@
 			<string>7E804D925461714118DB355C65BC964B41D94376</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxUI</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>752B89503EB005D8DB7735E38B3A3A37374BD207</string>
+			<key>IDESourceControlWCCName</key>
+			<string>waterPlane</string>
 		</dict>
 	</array>
 </dict>

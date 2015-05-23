@@ -4,25 +4,41 @@
 
 #include "ofxUI.h"
 
+#define TORAD 0.017453292519943295
+
 class ofApp : public ofBaseApp{
 
 public:
-    const int NUM_DETAILS = 96;
-    const float INV_NUM_DETAILS = 1.0 / NUM_DETAILS;
-    const float MESH_SIZE = 100;
+    int NUM_DETAILS;
+//    int NUM_DETAILSY;
+    float INV_NUM_DETAILS;
+//    float INV_NUM_DETAILSY;
+    float MESH_SIZE;
 
     ofApp()
     {
-        viewedAngleH = 0;
-        viewedAngleV = -20 * 0.017453292519943295;
-        cameraDistance = MESH_SIZE*10;
-        focalLength = MESH_SIZE * 4;
-        boxHeight = MESH_SIZE*0.75;
+        NUM_DETAILS = 256;
+        INV_NUM_DETAILS = 1.0 / (float)NUM_DETAILS;
+//        NUM_DETAILSY = 120;
+//        INV_NUM_DETAILSY = 1.0 / (float)NUM_DETAILSY;
+        MESH_SIZE = 300.0;
+        viewedAngleH = 0.0;
+        viewedAngleV = 0.0;
+        refAlpha = 0.6;
+        refrac = 1.4;
+        reflec = 0.4;
+        cameraDistance = MESH_SIZE*3;
+        focalLength = MESH_SIZE*3;
+        boxHeight = MESH_SIZE*0.25;
         refractiveIndex = 1.4;
+        camFov = 10.0;
+        bDebugDraw = false;
     }
     void setup();
     void update();
     void draw();
+    
+    void makeCamPos();
 
     void keyPressed(int key);
     void keyReleased(int key);
@@ -42,29 +58,34 @@ public:
 private:
     // Functional
     void setMesh();
+    void setVbo();
+    void updateVbo();
     void transformVertices();
+    void changeWindow();
     int getIndex(int x, int y){ return y * NUM_DETAILS + x; }
     
     ofFbo fbo;
     ofCamera cam3d;
-//    ofEasyCam cam3d;
+    ofPoint msPos, pMsPos;
+    
+    bool bDebugDraw;
     
     unsigned int count;
-    ofImage bmd, bmd2;
-    ofTexture *bmdTex, *bmdTex2;
+    unsigned int reflecMode, refracMode;
+    vector<ofTexture* > vRefractionTex, vReflectionTex;
     vector<ofVec3f> vertices;
     vector<float> transformedVertices;
     vector<unsigned int> indices;
-    vector<float> uvt;
-    vector<float> uvt2;
-    float width2;
-    float height2;
+    vector<float> uvtReflection;
+    vector<float> uvtRefraction;
+    float width, width2;
+    float height, height2, adjustHeight;
     vector<vector<float> > heights;
     vector<vector<float> > velocity;
     
     float viewedAngleH;
     float viewedAngleV;
-    float cameraDistance;
+    float cameraDistance, camFov;
     float focalLength;
     float boxHeight;
     float refractiveIndex;
