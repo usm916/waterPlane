@@ -1,7 +1,9 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup()
+{
+    ofSetLogLevel(OF_LOG_SILENT);
     fbo.allocate(1280, 800, GL_RGBA);
     
     ofDisableArbTex();
@@ -32,18 +34,13 @@ void ofApp::setup(){
     
     transformedVertices.assign( NUM_DETAILS * NUM_DETAILS * 2, 0.0f );
     // indices;
-    uvtReflection.clear();
-    uvtRefraction.clear();
-    for(int i=0;i<(NUM_DETAILS * NUM_DETAILS * 2);i++)
+    uvtSize = NUM_DETAILS * NUM_DETAILS;//(int)sizeof(uvtRefraction)/sizeof(float);
+    for(int i=0;i<uvtSize;i++)
     {
-        uvtReflection.push_back(0.0f);
-        uvtRefraction.push_back(0.0f);
+        uvtReflection.push_back(ofVec2f(0.0f));
+        uvtRefraction.push_back(ofVec2f(0.0f));
     }
-//    uvtReflection.assign( size_t(NUM_DETAILS * NUM_DETAILS * 2), 0.0f );
-//    ofLog() << "uvtReflection max_size: " << uvtReflection.max_size() << " " << uvtReflection[0] << " " << &uvtReflection[0];
-//    uvtRefraction.assign( size_t(NUM_DETAILS * NUM_DETAILS * 2), 0.0f );
-//    ofLog() << "uvtRefraction max_size: " << uvtRefraction.max_size() << " " << uvtRefraction[0] << " " << &uvtRefraction[0];
-
+    
     // [modification] change surface from x-z plane to x-y plane in order to fit together with normal calculation.
     vertices.assign( NUM_DETAILS * NUM_DETAILS, ofVec3f(0) );
     for(int i=2;i<NUM_DETAILS-2;i++)
@@ -52,7 +49,6 @@ void ofApp::setup(){
         {
             vertices[ getIndex(j,i) ] = ofVec3f((j-(NUM_DETAILS-1) * 0.5) / NUM_DETAILS * MESH_SIZE,
                                                  (i-(NUM_DETAILS-1) * 0.5) / NUM_DETAILS * MESH_SIZE, 0);
-//            cout << vertices[ getIndex(j,i) ] << endl;
             if( i!=2 && j!=2 )
             {
                 indices.push_back( getIndex(i, j) );
@@ -73,37 +69,32 @@ void ofApp::setup(){
     {
         heights[i].assign( NUM_DETAILS, 0.0);
         velocity[i].assign( NUM_DETAILS, 0.0);
-//        for(int j = 0; j < NUM_DETAILS; j++)
-//        {
-//            heights[i][j] = 0;
-//            velocity[i][j] = 0;
-//        }
     }
-    ofLogNotice() << "vert " << (int)vertices.size();
-    ofLogNotice() << "uvt " << (int)uvtRefraction.size();
-    ofLogNotice() << "indices " << (int)indices.size();
+    ofLogNotice() << "vert    : " << (int)vertices.size();
+    ofLogNotice() << "uvt     : " << uvtReflection.size() << " - " << uvtSize;
+    ofLogNotice() << "indices : " << (int)indices.size();
     
     // [modification] Rendering layers
     setVbo();
-    
     setupGUI();
-    
     makeCamPos();
 }
 
 void ofApp::setVbo()
 {
-    ofLog() << "reflec " << &uvtReflection[0];
-    vboReflection.setIndexData(&indices[0], (unsigned int)indices.size(), GL_STATIC_DRAW);
+    vboReflection = new ofVbo();
+//    ofLog() << "reflec " << &uvtReflection[0] << " : " << uvtReflection;
+    vboReflection->setIndexData(&indices[0], (int)indices.size(), GL_STATIC_DRAW);
     
-    ofLog() << "refrac " << &uvtRefraction[0];
-    vboRefraction.setIndexData(&indices[0], (unsigned int)indices.size(), GL_STATIC_DRAW);
+    vboRefraction = new ofVbo();
+//    ofLog() << "refrac " << &uvtRefraction[0] << " : " << uvtRefraction;
+    vboRefraction->setIndexData(&indices[0], (int)indices.size(), GL_STATIC_DRAW);
     
     updateVbo();
 }
 
-void ofApp::setupGUI(){
-
+void ofApp::setupGUI()
+{
     // [modification] controlers
     gui = new ofxUISuperCanvas("Water Plane params");
     gui->addSlider("AngleV", -60, 60, &viewedAngleV);
@@ -113,7 +104,6 @@ void ofApp::setupGUI(){
     gui->addSlider("Reflection", 0, 1.0, &refAlpha);
     gui->autoSizeToFitWidgets();
     ofAddListener( gui->newGUIEvent, this, &ofApp::guiEvent);
-
 }
 
 void ofApp::guiEvent(ofxUIEventArgs &e)
@@ -122,7 +112,9 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update()
+{
+    
 //    if(ofGetFrameNum()%180==0)ofLog() << ofGetFrameRate();
     pMsPos = msPos;
     msPos = ofPoint(ofGetMouseX(), ofGetMouseY());
@@ -140,14 +132,13 @@ void ofApp::update(){
 
 void ofApp::updateVbo()
 {
-    vboReflection.setVertexData(&vertices[0], (unsigned int)vertices.size(), GL_DYNAMIC_DRAW);
-    vboReflection.setTexCoordData(&uvtReflection[0], (unsigned int)uvtReflection.size(), GL_DYNAMIC_DRAW, 2*sizeof(float));
-
-    vboRefraction.setVertexData(&vertices[0], (unsigned int)vertices.size(), GL_DYNAMIC_DRAW);
-    vboRefraction.setTexCoordData(&uvtRefraction[0], (unsigned int)uvtRefraction.size(), GL_DYNAMIC_DRAW, 2*sizeof(float));
+    //
+    vboReflection->setVertexData( &vertices[0], (int)vertices.size(), GL_DYNAMIC_DRAW);
+    vboReflection->setTexCoordData( &uvtReflection[0], uvtSize, GL_DYNAMIC_DRAW);
+    //
+    vboRefraction->setVertexData( &vertices[0], (int)vertices.size(), GL_DYNAMIC_DRAW);
+    vboRefraction->setTexCoordData( &uvtRefraction[0], uvtSize, GL_DYNAMIC_DRAW);
 }
-
-
 
 void ofApp::makeCamPos()
 {
@@ -172,10 +163,10 @@ void ofApp::makeCamPos()
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw()
+{
     
 //    ofEnableBlendMode(OF_BLENDMODE_ADD);
-    
     fbo.begin();
     cam3d.begin();
     ofFill();
@@ -184,15 +175,13 @@ void ofApp::draw(){
     ofSetColor(255);
     ofNoFill();
     
-
-    
     vRefractionTex[refracMode]->bind();
-    vboRefraction.drawElements(GL_TRIANGLES, (unsigned int)indices.size());
+    vboRefraction->drawElements(GL_TRIANGLES, (unsigned int)indices.size());
     vRefractionTex[refracMode]->unbind();
     
     ofSetColor(255,255*refAlpha);
     vReflectionTex[reflecMode]->bind();
-    vboReflection.drawElements(GL_TRIANGLES, (unsigned int)indices.size());
+    vboReflection->drawElements(GL_TRIANGLES, (unsigned int)indices.size());
     vReflectionTex[reflecMode]->unbind();
 
     // test of vertices
@@ -202,9 +191,10 @@ void ofApp::draw(){
         ofLine(0,-MESH_SIZE,0,MESH_SIZE);
         ofSetColor(255,128,0);
         ofLog() << "vert " << vertices.size();
+        
         for(int i=0;i<vertices.size();i++)
         {
-            ofRect(vertices[i].x,vertices[i].y,vertices[i].z,1,1);
+            ofRect( vertices[i].x, vertices[i].y, vertices[i].z, 1, 1 );
         }
     }
     cam3d.end();
@@ -218,8 +208,10 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
-    switch (key) {
+void ofApp::keyPressed(int key)
+{
+    switch (key)
+    {
         case '[':
             refracMode = (refracMode+1)%(vRefractionTex.size());
             break;
@@ -351,8 +343,8 @@ void ofApp::setMesh()
             nx *= len;
             ny *= len;
             nz = len;
-            uvtReflection[index * 2] = nx * 0.5 + 0.5 + ((i-NUM_DETAILS * 0.5) * INV_NUM_DETAILS * 0.25);
-            uvtReflection[index * 2 + 1] = ny * 0.5 + 0.5 + ((NUM_DETAILS * 0.5-j) * INV_NUM_DETAILS * 0.25);
+            uvtReflection[index].x = nx * 0.5 + 0.5 + ((i-NUM_DETAILS * 0.5) * INV_NUM_DETAILS * 0.25);
+            uvtReflection[index].y = ny * 0.5 + 0.5 + ((NUM_DETAILS * 0.5-j) * INV_NUM_DETAILS * 0.25);
             
             // [modification] Refraction map
             // incident vector (you can calculate them in the setup if you want faster)
@@ -380,7 +372,7 @@ void ofApp::setMesh()
             {
                 if (dy == 0)
                 {
-                    uvtRefraction[index * 2] = uvtRefraction[index * 2 + 1] = 0.5;
+                    uvtRefraction[index].x = uvtRefraction[index].y = 0.5;
                     sign = 0;
                 }
                 else
@@ -399,12 +391,12 @@ void ofApp::setMesh()
                     if (hitz > boxHeight)
                     {
                         r = (boxHeight-v->z) / dz;
-                        uvtRefraction[index * 2]     = (dx * r + v->x) * ixymax * 0.25 + 0.5;
-                        uvtRefraction[index * 2 + 1] = (dy * r + v->y) * ixymax * 0.25 + 0.5;
+                        uvtRefraction[index].x     = (dx * r + v->x) * ixymax * 0.25 + 0.5;
+                        uvtRefraction[index].y = (dy * r + v->y) * ixymax * 0.25 + 0.5;
                     } else {
                         r = boxHeight / (hitz + boxHeight);
-                        uvtRefraction[index * 2]     = sign       * r * 0.5 + 0.5;
-                        uvtRefraction[index * 2 + 1] = s * ixymax * r * 0.5 + 0.5;
+                        uvtRefraction[index].x     = sign       * r * 0.5 + 0.5;
+                        uvtRefraction[index].y = s * ixymax * r * 0.5 + 0.5;
                     }
                     sign = 0;
                 }
@@ -422,14 +414,14 @@ void ofApp::setMesh()
                 if (hitz > boxHeight)
                 {
                     r = (boxHeight-v->z) / dz;
-                    uvtRefraction[index * 2]     = (dx * r + v->x) * ixymax * 0.25 + 0.5;
-                    uvtRefraction[index * 2 + 1] = (dy * r + v->y) * ixymax * 0.25 + 0.5;
+                    uvtRefraction[index].x     = (dx * r + v->x) * ixymax * 0.25 + 0.5;
+                    uvtRefraction[index].y = (dy * r + v->y) * ixymax * 0.25 + 0.5;
                 }
                 else
                 {
                     r = boxHeight / (hitz + boxHeight);
-                    uvtRefraction[index * 2]     = s * ixymax * r * 0.5 + 0.5;
-                    uvtRefraction[index * 2 + 1] = sign       * r * 0.5 + 0.5;
+                    uvtRefraction[index].x     = s * ixymax * r * 0.5 + 0.5;
+                    uvtRefraction[index].y = sign       * r * 0.5 + 0.5;
                 }
             }
         }
@@ -457,8 +449,8 @@ void ofApp::changeWindow()
 {
     width = ofGetWidth();
     height = ofGetHeight();
-    width2 = width / 2;
-    height2 = height / 2;
+    width2 = width/2;
+    height2 = height/2;
     adjustHeight = (width-height)/2;
 }
 

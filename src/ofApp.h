@@ -76,8 +76,9 @@ private:
     vector<ofVec3f> vertices;
     vector<float> transformedVertices;
     vector<unsigned int> indices;
-    vector<float> uvtReflection;
-    vector<float> uvtRefraction;
+    vector<ofVec2f> uvtReflection;
+    vector<ofVec2f> uvtRefraction;
+    int uvtSize;
     float width, width2;
     float height, height2, adjustHeight;
     vector<vector<float> > heights;
@@ -89,8 +90,8 @@ private:
     float focalLength;
     float boxHeight;
     float refractiveIndex;
-    ofVbo vboReflection;
-    ofVbo vboRefraction;
+    ofVbo* vboReflection;
+    ofVbo* vboRefraction;
     float refAlpha;
     ofVec3f cameraPosition;
     float m00, m01, m02, m10, m11, m12, m20, m21, m22;
