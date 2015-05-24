@@ -34,7 +34,8 @@ void ofApp::setup()
     
     transformedVertices.assign( NUM_DETAILS * NUM_DETAILS * 2, 0.0f );
     // indices;
-    uvtSize = NUM_DETAILS * NUM_DETAILS;//(int)sizeof(uvtRefraction)/sizeof(float);
+    // UVW
+    uvtSize = NUM_DETAILS * NUM_DETAILS;
     for(int i=0;i<uvtSize;i++)
     {
         uvtReflection.push_back(ofVec2f(0.0f));
@@ -115,7 +116,11 @@ void ofApp::guiEvent(ofxUIEventArgs &e)
 void ofApp::update()
 {
     
-//    if(ofGetFrameNum()%180==0)ofLog() << ofGetFrameRate();
+    if(ofGetFrameNum()%180==0)
+    {
+        ripple( width*0.5-(adjustHeight + ofRandom(1280) )/ width * MESH_SIZE, (width*0.5- ofRandom(1280) )/ width * MESH_SIZE, 5);
+//        ofLog() << ofGetFrameRate();
+    }
     pMsPos = msPos;
     msPos = ofPoint(ofGetMouseX(), ofGetMouseY());
     count++;
@@ -166,7 +171,7 @@ void ofApp::makeCamPos()
 void ofApp::draw()
 {
     
-//    ofEnableBlendMode(OF_BLENDMODE_ADD);
+    ofEnableBlendMode(OF_BLENDMODE_ADD);
     fbo.begin();
     cam3d.begin();
     ofFill();
@@ -243,16 +248,16 @@ void ofApp::mouseMoved(int x, int y ){
 void ofApp::mouseDragged(int x, int y, int button){
     float adjustWidth = 50;
     float sWidth = width + 100;
-    ripple( ( width*0.5-(adjustHeight + y) )/ width * MESH_SIZE, (sWidth*0.5-(adjustWidth+x) )/ sWidth * MESH_SIZE, 5);
+    ripple( ( width*0.5-(adjustHeight + y) )/ width * MESH_SIZE, (sWidth*0.5-(adjustWidth+x) )/ sWidth * MESH_SIZE, 5 + ofRandomf());
     ofPoint half = msPos+(pMsPos-msPos)*0.4;
-    ripple( ( width*0.5-(adjustHeight + half.y) )/ width * MESH_SIZE, (sWidth*0.5-(adjustWidth+half.x) )/ sWidth * MESH_SIZE, 3);
+    ripple( ( width*0.5-(adjustHeight + half.y) )/ width * MESH_SIZE, (sWidth*0.5-(adjustWidth+half.x) )/ sWidth * MESH_SIZE, 3 + ofRandomf());
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     float adjustWidth = 50;
     float sWidth = width + 100;
-    ripple( ( width*0.5-(adjustHeight + y) )/ width * MESH_SIZE, (sWidth*0.5-(adjustWidth+x) )/ sWidth * MESH_SIZE, 9);
+    ripple( ( width*0.5-(adjustHeight + y) )/ width * MESH_SIZE, (sWidth*0.5-(adjustWidth+x) )/ sWidth * MESH_SIZE, 9 + ofRandomf());
 }
 
 //--------------------------------------------------------------
