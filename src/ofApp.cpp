@@ -88,11 +88,9 @@ void ofApp::setup()
 void ofApp::setVbo()
 {
     vboReflection = new ofVbo();
-//    ofLog() << "reflec " << &uvtReflection[0] << " : " << uvtReflection;
     vboReflection->setIndexData(&indices[0], (int)indices.size(), GL_STATIC_DRAW);
     
     vboRefraction = new ofVbo();
-//    ofLog() << "refrac " << &uvtRefraction[0] << " : " << uvtRefraction;
     vboRefraction->setIndexData(&indices[0], (int)indices.size(), GL_STATIC_DRAW);
     
     updateVbo();
@@ -104,6 +102,8 @@ void ofApp::setupGUI()
     int btnSizeY = 15;
     // [modification] controlers
     gui = new ofxUISuperCanvas("Water Plane params");
+    gui->setPosition(20, 20);
+    gui->addLabel("'h' - toggle gui");
     gui->addSlider("AngleV", -60, 60, &viewedAngleV);
     gui->addSlider("AngleH", -45, 45, &viewedAngleH);
     gui->addSlider("Fov", 0, 40, &camFov);
@@ -121,8 +121,6 @@ void ofApp::setupGUI()
     gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     gui->autoSizeToFitWidgets();
     ofAddListener( gui->newGUIEvent, this, &ofApp::guiEvent);
-    
-    gui->toggleVisible();
 }
 
 void ofApp::guiEvent(ofxUIEventArgs &e)
@@ -165,7 +163,6 @@ void ofApp::update()
     if(ofGetFrameNum()%180==0)
     {
         ripple( width*0.5-(adjustHeight + ofRandom(1280) )/ width * MESH_SIZE, (width*0.5- ofRandom(1280) )/ width * MESH_SIZE, 5);
-//        ofLog() << ofGetFrameRate();
     }
     pMsPos = msPos;
     msPos = ofPoint(ofGetMouseX(), ofGetMouseY());
@@ -173,7 +170,6 @@ void ofApp::update()
 
     updateWaterSurface();
     setMesh();
-    transformVertices();
 
     cam3d.lookAt( ofVec3f(0) );
     cam3d.setPosition(cameraPosition);
