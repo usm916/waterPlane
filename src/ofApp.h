@@ -72,6 +72,7 @@ private:
     
     unsigned int count;
     unsigned int reflecMode, refracMode;
+    int reflecNum, refracNum, curFr;
     vector<ofTexture* > vRefractionTex, vReflectionTex;
     vector<ofVec3f> vertices;
     vector<float> transformedVertices;

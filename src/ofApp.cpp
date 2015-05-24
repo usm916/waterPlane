@@ -22,6 +22,10 @@ void ofApp::setup()
         vReflectionTex.push_back( new ofTexture() );
         ofLoadImage( *vReflectionTex[i], dirSky.getPath(i) );
     }
+    
+    reflecNum = vReflectionTex.size() * 1000;
+    refracNum = vRefractionTex.size() * 1000;
+
     ofEnableAlphaBlending();
     
     reflecMode = 0;
@@ -96,6 +100,8 @@ void ofApp::setVbo()
 
 void ofApp::setupGUI()
 {
+    int btnSizeX = 35;
+    int btnSizeY = 15;
     // [modification] controlers
     gui = new ofxUISuperCanvas("Water Plane params");
     gui->addSlider("AngleV", -60, 60, &viewedAngleV);
@@ -103,13 +109,53 @@ void ofApp::setupGUI()
     gui->addSlider("Fov", 0, 40, &camFov);
     gui->addSlider("Refraction", 0, 20, &refractiveIndex);
     gui->addSlider("Reflection", 0, 1.0, &refAlpha);
+    gui->addLabelButton("<- s", false, btnSizeX, btnSizeY);
+    gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    gui->addLabel("Sky  tex");
+    gui->addLabelButton("s ->", false, btnSizeX, btnSizeY);
+    gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+    gui->addLabelButton("<- b", false, btnSizeX, btnSizeY);
+    gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    gui->addLabel("Base tex");
+    gui->addLabelButton("b ->", false, btnSizeX, btnSizeY);
+    gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
     gui->autoSizeToFitWidgets();
     ofAddListener( gui->newGUIEvent, this, &ofApp::guiEvent);
+    
+    gui->toggleVisible();
 }
 
 void ofApp::guiEvent(ofxUIEventArgs &e)
 {
+    string name = e.getName();
+    int kind = e.getKind();
+    bool bButton = e.getButton();
+    
     makeCamPos();
+    if( bButton == true )
+    {
+        ofxUIButton *button = (ofxUIButton *) e.widget;
+        if( name=="<- b" && button->getValue() )
+        {
+            refracNum -= 1;
+            refracMode = (refracNum)%(vRefractionTex.size());
+        }
+        else if( name=="b ->" && button->getValue() )
+        {
+            refracNum += 1;
+            refracMode = (refracMode+1)%(vRefractionTex.size());
+        }
+        else if( name=="<- s" && button->getValue() )
+        {
+            reflecNum -= 1;
+            reflecMode = (reflecNum)%(vReflectionTex.size());
+        }
+        else if( name=="s ->" && button->getValue() )
+        {
+            reflecNum += 1;
+            reflecMode = (reflecNum)%(vReflectionTex.size());
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -217,17 +263,8 @@ void ofApp::keyPressed(int key)
 {
     switch (key)
     {
-        case '[':
-            refracMode = (refracMode+1)%(vRefractionTex.size());
-            break;
-        case ']':
-            refracMode = (refracMode-1)%(vRefractionTex.size());
-            break;
-        case '-':
-            reflecMode = (reflecMode+1)%(vReflectionTex.size());
-            break;
-        case '=':
-            reflecMode = (reflecMode-1)%(vReflectionTex.size());
+        case 'h':
+            gui->toggleVisible();
             break;
         default:
             break;
