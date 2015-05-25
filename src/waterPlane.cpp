@@ -181,9 +181,6 @@ void WaterPlane::update()
     updateWaterSurface();
     setMesh();
     
-    cam3d.lookAt( ofVec3f(0) );
-    cam3d.setPosition(cameraPosition);
-    
     updateVbo();
 }
 
